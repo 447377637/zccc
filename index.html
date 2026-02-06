@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Wedding</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #111111;
+      --muted: #777777;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+    }
+
+    header h1 {
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin-top: 16px;
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      font-size: 14px;
+      color: var(--muted);
+      animation: fade 2s infinite;
+    }
+
+    @keyframes fade {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    section.gallery {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 24px 120px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+    }
+
+    .photo {
+      position: relative;
+      overflow: hidden;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 1.2s ease;
+    }
+
+    .photo:hover img {
+      transform: scale(1.08);
+    }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 16px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px 80px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>We Got Married</h1>
+    <p>我们的婚纱照 · A Moment, Forever</p>
+    <div class="scroll-hint">向下滚动 ↓</div>
+  </header>
+
+  <section class="gallery">
+    <!-- 将 images 文件夹中的照片命名为 1.jpg ~ 12.jpg -->
+    <div class="photo"><img src="images/1.jpg" alt="wedding photo"></div>
+    <div class="photo"><img src="images/2.jpg" alt="wedding photo"></div>
+    <div class="photo"><img src="images/3.jpg" alt="wedding photo"></div>
+    <div class="photo"><img src="images/4.jpg" alt="wedding photo"></div>
+    <div class="photo"><img src="images/5.jpg" alt="wedding photo"></div>
+    <div class="photo"><img src="images/6.jpg" alt="wedding photo"></div>
+    <div class="photo"><img src="images/7.jpg" alt="wedding photo"></div>
+    <div class="photo"><img src="images/8.jpg" alt="wedding photo"></div>
+    <div class="photo"><img src="images/9.jpg" alt="wedding photo"></div>
+    <div class="photo"><img src="images/10.jpg" alt="wedding photo"></div>
+    <div class="photo"><img src="images/11.jpg" alt="wedding photo"></div>
+    <div class="photo"><img src="images/12.jpg" alt="wedding photo"></div>
+  </section>
+
+  <div class="lightbox" id="lightbox">
+    <img src="" alt="preview">
+  </div>
+
+  <footer>
+    © 2026 · With Love
+  </footer>
+
+  <script>
+    const photos = document.querySelectorAll('.photo img');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = lightbox.querySelector('img');
+
+    photos.forEach(img => {
+      img.addEventListener('click', () => {
+        lightboxImg.src = img.src;
+        lightbox.classList.add('active');
+      });
+    });
+
+    lightbox.addEventListener('click', () => {
+      lightbox.classList.remove('active');
+      lightboxImg.src = '';
+    });
+  </script>
+
+</body>
+</html>
