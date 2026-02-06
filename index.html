@@ -8,7 +8,8 @@
     :root {
       --bg: #ffffff;
       --text: #111111;
-      --muted: #777777;
+      --muted: #888888;
+      --accent: #d6b8a9; /* 浪漫暖色 */
     }
 
     * {
@@ -32,12 +33,17 @@
       justify-content: center;
       text-align: center;
       padding: 40px;
+      background: linear-gradient(180deg, #fff 0%, #faf6f3 100%);
     }
 
     header h1 {
       font-size: clamp(36px, 6vw, 72px);
       font-weight: 600;
       letter-spacing: -0.02em;
+    }
+
+    header h1 span {
+      color: var(--accent);
     }
 
     header p {
@@ -60,6 +66,28 @@
     }
 
     section.gallery {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 24px 120px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 36px;
+    }
+
+    .photo {
+      position: relative;
+      overflow: hidden;
+      border-radius: 22px;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 1.2s ease, transform 1.2s ease;
+    }
+
+    .photo.show {
+      opacity: 1;
+      transform: translateY(0);
+    } {
       max-width: 1200px;
       margin: 0 auto;
       padding: 80px 24px 120px;
@@ -110,34 +138,51 @@
 
     footer {
       text-align: center;
-      padding: 40px 20px 80px;
+      padding: 60px 20px 100px;
       color: var(--muted);
       font-size: 14px;
+    }
+
+    section.chapter {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 120px 24px 80px;
+      text-align: center;
+    }
+
+    section.chapter h2 {
+      font-size: 32px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      letter-spacing: 0.02em;
+    }
+
+    section.chapter p {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>We Got Married</h1>
-    <p>我们的婚纱照 · A Moment, Forever</p>
-    <div class="scroll-hint">向下滚动 ↓</div>
+    <h1>欢迎，下面将要展示的是</h1>
+    <h2>周长城 <span>&</span> 周杨玲</h2>
+    <p>婚纱相册</p>
+    <div class="scroll-hint">请向下翻阅 ↓</div>
   </header>
 
-  <section class="gallery">
-    <!-- 将 images 文件夹中的照片命名为 1.jpg ~ 12.jpg -->
-    <div class="photo"><img src="images/1.jpg" alt="wedding photo"></div>
-    <div class="photo"><img src="images/2.jpg" alt="wedding photo"></div>
-    <div class="photo"><img src="images/3.jpg" alt="wedding photo"></div>
-    <div class="photo"><img src="images/4.jpg" alt="wedding photo"></div>
-    <div class="photo"><img src="images/5.jpg" alt="wedding photo"></div>
-    <div class="photo"><img src="images/6.jpg" alt="wedding photo"></div>
-    <div class="photo"><img src="images/7.jpg" alt="wedding photo"></div>
-    <div class="photo"><img src="images/8.jpg" alt="wedding photo"></div>
-    <div class="photo"><img src="images/9.jpg" alt="wedding photo"></div>
-    <div class="photo"><img src="images/10.jpg" alt="wedding photo"></div>
-    <div class="photo"><img src="images/11.jpg" alt="wedding photo"></div>
-    <div class="photo"><img src="images/12.jpg" alt="wedding photo"></div>
+  <section class="chapter">
+    <h2>Ceremony</h2>
+    <p>誓言，是这一天最安静也最坚定的部分。</p>
+  </section>
+
+  <section class="gallery" id="gallery"></section>
+
+  <section class="chapter">
+    <h2>Moments</h2>
+    <p>光影、笑容、风，还有你。</p>
   </section>
 
   <div class="lightbox" id="lightbox">
@@ -149,15 +194,60 @@
   </footer>
 
   <script>
-    const photos = document.querySelectorAll('.photo img');
+    const gallery = document.getElementById('gallery');
+    const totalPhotos = 55; // 照片总数
+
+    // 生成占位 + 图片节点
+    for (let i = 1; i <= totalPhotos; i++) {
+      const div = document.createElement('div');
+      div.className = 'photo';
+
+      // 骨架屏占位
+      div.style.background = 'linear-gradient(100deg, #f3f3f3 40%, #eaeaea 50%, #f3f3f3 60%)';
+      div.style.backgroundSize = '200% 100%';
+      div.style.animation = 'loading 1.4s ease infinite';
+
+      const img = document.createElement('img');
+      img.dataset.src = `images/${i}.jpg`;
+      img.alt = 'wedding photo';
+      img.loading = 'lazy';
+
+      div.appendChild(img);
+      gallery.appendChild(div);
+    }
+
+    // 懒加载 + 出现动画
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target.querySelector('img');
+          if (img && !img.src) {
+            img.src = img.dataset.src;
+            img.onload = () => {
+              entry.target.style.animation = 'none';
+              entry.target.style.background = 'none';
+            };
+          }
+          entry.target.classList.add('show');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.01,
+      rootMargin: '600px 0px'
+    });
+
+    document.querySelectorAll('.photo').forEach(photo => observer.observe(photo));
+
+    // Lightbox
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = lightbox.querySelector('img');
 
-    photos.forEach(img => {
-      img.addEventListener('click', () => {
-        lightboxImg.src = img.src;
+    gallery.addEventListener('click', e => {
+      if (e.target.tagName === 'IMG' && e.target.src) {
+        lightboxImg.src = e.target.src;
         lightbox.classList.add('active');
-      });
+      }
     });
 
     lightbox.addEventListener('click', () => {
